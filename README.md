@@ -598,6 +598,10 @@ docker-compose -f docker-compose-dev.yml up -d
 
 Quindi avvia l'applicazione in modalità sviluppo:
 ```
+# se utilizzi Maven
+mvn spring-boot:run
+
+# oppure usando il Maven Wrapper
 ./mvnw spring-boot:run
 ```
 
@@ -836,12 +840,18 @@ Il progetto utilizza Maven Wrapper e i plugin Maven Surefire e Failsafe per gest
 #### Eseguire solo i Test Unitari
 ```
 # comando che esegue tutti i file che terminano con *Test.java.
+mvn test
+
+# oppure usando il Maven Wrapper
 ./mvnw test
 ```
 
 #### Eseguire solo i Test di Integrazione
 ```
 # comando che esegue tutti i file che terminano con *IT.java o *E2ETest.java.
+mvn failsafe:integration-test
+
+# oppure usando il Maven Wrapper
 ./mvnw failsafe:integration-test
 ```
 
