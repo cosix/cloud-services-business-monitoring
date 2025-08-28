@@ -1,0 +1,128 @@
+@startuml "Cloud Services Business Monitoring - Domain Model"
+
+!define ENTITY class
+!define PRIMARY_KEY <b>
+!define FOREIGN_KEY <i>
+!define UNIQUE_KEY <u>
+
+skinparam class {
+  BackgroundColor #F8F9FA
+  ArrowColor #2C3E50
+  BorderColor #2C3E50
+}
+
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam nodesep 80
+skinparam ranksep 100
+
+ENTITY CloudService {
+  PRIMARY_KEY id: Long
+  UNIQUE_KEY customerId: String
+  UNIQUE_KEY serviceType: CloudServiceType
+  activationDate: LocalDate
+  expirationDate: LocalDate
+  amount: BigDecimal
+  status: CloudServiceStatus
+  lastUpdated: LocalDateTime
+  --
+  <i>unique constraint: (customerId, serviceType)</i>
+}
+
+ENTITY FileUpload {
+  PRIMARY_KEY id: Long
+  filename: String
+  UNIQUE_KEY fileHash: String
+  uploadDate: LocalDateTime
+  uploadedBy: String
+  status: FileUploadStatus
+  totalRecords: Integer
+  validRecords: Integer
+  invalidRecords: Integer
+  --
+  canBeReprocessed(): boolean
+}
+
+ENTITY JobExecution {
+  PRIMARY_KEY id: Long
+  UNIQUE_KEY jobId: String
+  status: JobStatus
+  startTime: LocalDateTime
+  endTime: LocalDateTime
+  filePath: String
+  errorMessage: String
+  createdBy: String
+  FOREIGN_KEY fileUpload_id: Long
+}
+
+ENTITY ProcessingError {
+  PRIMARY_KEY id: Long
+  lineNumber: Integer
+  rawData: String
+  errorMessage: String
+  createdAt: LocalDateTime
+  errorType: FileErrorType
+  FOREIGN_KEY fileUpload_id: Long
+}
+
+ENTITY ServiceFileRelation {
+  PRIMARY_KEY id: Long
+  operationType: FileOperationType
+  lineNumber: Integer
+  FOREIGN_KEY service_id: Long
+  FOREIGN_KEY fileUpload_id: Long
+}
+
+enum CloudServiceType {
+  HOSTING
+  PEC
+  SPID
+  FATTURAZIONE
+  FIRMA_DIGITALE
+  CONSERVAZIONE_DIGITALE
+}
+
+enum CloudServiceStatus {
+  ACTIVE
+  EXPIRED
+  PENDING_RENEWAL
+}
+
+enum FileUploadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum FileErrorType {
+  PARSING_ERROR
+  PROCESSING_ERROR
+}
+
+enum FileOperationType {
+  CREATE
+  UPDATE
+}
+
+CloudService "1" -- "0..*" ServiceFileRelation
+FileUpload "1" -- "0..*" ServiceFileRelation
+FileUpload "1" -- "0..*" ProcessingError : registra
+FileUpload "1" -- "0..*" JobExecution : esegue
+
+CloudService -- CloudServiceType : tipo
+CloudService -- CloudServiceStatus : stato
+FileUpload -- FileUploadStatus : stato
+JobExecution -- JobStatus : stato
+ProcessingError -- FileErrorType : tipo
+ServiceFileRelation -- FileOperationType : operazione
+
+@enduml

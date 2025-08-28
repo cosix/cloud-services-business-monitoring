@@ -1,0 +1,45 @@
+@startuml
+actor "Utente (data_uploader)" as User
+participant "API REST" as API
+participant "File Upload Service" as UploadService
+participant "File Storage" as Storage
+participant "Job Execution Service" as JobService
+participant "Domain Event Publisher" as EventPublisher
+participant "Spring Event System" as SpringEvents
+participant "File Processor" as Processor
+database "Database" as DB
+participant "Notification System" as Notification
+
+User -> API: Carica file CSV
+activate API
+API -> UploadService: uploadFile(file)
+activate UploadService
+
+UploadService -> UploadService: Valida file
+UploadService -> UploadService: Calcola hash del file
+UploadService -> DB: Verifica duplicati
+UploadService -> JobService: Crea job di elaborazione
+UploadService -> Storage: Salva file
+UploadService -> EventPublisher: Pubblica JobCreatedEvent
+EventPublisher -> SpringEvents: Registra evento per pubblicazione post-commit
+UploadService --> API: Restituisce ID job
+deactivate UploadService
+API --> User: Conferma caricamento
+deactivate API
+
+SpringEvents -> Processor: Notifica JobCreatedEvent (post-commit)
+activate Processor
+Processor -> Storage: Legge file
+Processor -> Processor: Analizza CSV riga per riga
+Processor -> DB: Salva servizi cloud in batch
+Processor -> DB: Registra errori di elaborazione
+Processor -> DB: Aggiorna stato job e file
+Processor -> EventPublisher: Pubblica FileProcessingCompletedEvent
+EventPublisher -> SpringEvents: Pubblica evento
+SpringEvents -> Notification: Notifica completamento elaborazione
+deactivate Processor
+
+User -> API: Verifica stato elaborazione
+API -> DB: Recupera stato job
+API --> User: Mostra risultati elaborazione
+@enduml

@@ -1,0 +1,14 @@
+
+
+${AnsiColor.YELLOW}  /$$$$$$   /$$$$$$  /$$$$$$$  /$$      /$$
+ /$$__  $$ /$$__  $$| $$__  $$| $$$    /$$$
+| $$  \__/| $$  \__/| $$  \ $$| $$$$  /$$$$
+| $$      |  $$$$$$ | $$$$$$$ | $$ $$/$$ $$
+| $$       \____  $$| $$__  $$| $$  $$$| $$
+| $$    $$ /$$  \ $$| $$  \ $$| $$\  $ | $$
+|  $$$$$$/|  $$$$$$/| $$$$$$$/| $$ \/  | $$
+ \______/  \______/ |_______/ |__/     |__/
+
+
+${AnsiColor.BRIGHT_YELLOW}${AnsiStyle.BOLD}:: Cloud Services Business Monitoring v${app.version} ::
+${AnsiColor.BLUE}:: Running Spring Boot ${AnsiColor.BRIGHT_BLUE}${spring-boot.version} :: ${AnsiColor.DEFAULT}

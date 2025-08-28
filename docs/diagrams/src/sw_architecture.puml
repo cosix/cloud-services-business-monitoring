@@ -1,0 +1,99 @@
+@startuml "Cloud Services Business Monitoring - Software Architecture"
+
+skinparam backgroundColor white
+
+skinparam package {
+  BackgroundColor #F8F9FA
+  BorderColor #2C3E50
+  FontColor #2C3E50
+  BorderThickness 2
+  Shadowing true
+}
+
+skinparam rectangle {
+  BackgroundColor #E8F5E9
+  BorderColor #2C3E50
+  FontColor #2C3E50
+  Shadowing true
+}
+
+skinparam arrow {
+  Color #2C3E50
+  FontColor #2C3E50
+  Thickness 1.5
+}
+
+skinparam note {
+  BackgroundColor #FFF9C4
+  BorderColor #FFD54F
+  FontColor #5D4037
+  Shadowing true
+}
+
+package "1. Presentation Layer" as PresentationLayer {
+  rectangle "web/rest - Controller REST" as RestController
+  rectangle "web/errors - Gestione Errori" as ErrorHandler
+  rectangle "dto - Data Transfer Objects" as DTO
+  rectangle "mapper - Convertitori" as Mapper
+  
+  note bottom of RestController
+    Espone le API REST e gestisce
+    la conversione dei dati
+  end note
+}
+
+package "2. Service Layer" as ServiceLayer {
+  rectangle "service - Logica di Business" as Service
+  rectangle "service/file - Gestione File" as FileService
+  rectangle "service/notification - Notifiche" as NotificationService
+  rectangle "service/report - Report" as ReportService
+  rectangle "service/scheduled - Job" as ScheduledService
+  
+  note bottom of Service
+    Implementa la logica di business
+    e orchestra i flussi applicativi
+  end note
+}
+
+package "3. Domain Layer" as DomainLayer {
+  rectangle "domain/model - Entità" as DomainModel
+  rectangle "domain/enumeration - Enum" as Enumeration
+  rectangle "domain/event - Eventi" as DomainEvent
+  rectangle "domain/file - File" as FileModel
+  rectangle "domain/notification - Notifiche" as NotificationModel
+  
+  note bottom of DomainModel
+    Rappresenta i concetti chiave
+    del business e le loro relazioni
+  end note
+}
+
+package "4. Persistence Layer" as PersistenceLayer {
+  rectangle "repository - Repository JPA" as Repository
+  rectangle "repository/projection - Proiezioni" as Projection
+  
+  note bottom of Repository
+    Fornisce accesso ai dati persistenti
+  end note
+}
+
+rectangle "Database" as DB
+
+package "5. Infrastructure Components" as Infrastructure {
+  rectangle "config - Configurazioni" as Config
+  rectangle "messaging - Kafka" as Messaging
+  rectangle "aop - Aspect Programming" as AOP
+  rectangle "util - Utilità" as Util
+  
+  note bottom of Config
+    Componenti trasversali che supportano
+    tutti i layer dell'applicazione
+  end note
+}
+
+PresentationLayer -down-> ServiceLayer
+ServiceLayer -down-> DomainLayer
+ServiceLayer -down-> PersistenceLayer
+PersistenceLayer -down-> DB
+
+@enduml

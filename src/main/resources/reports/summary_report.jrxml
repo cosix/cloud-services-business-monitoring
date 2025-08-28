@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.5.final using JasperReports Library version 6.21.5-74d586df47b25dbd05bd0957999819196e59934a  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SummaryReport" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="30" bottomMargin="30" uuid="caf631bc-22ef-4d71-a48b-70c985bb3d80">
+	<style name="Title" fontName="Arial" fontSize="18" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SectionHeader" fontName="Arial" fontSize="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="TableHeader" fontName="Arial" fontSize="10" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="TableData" fontName="Arial" fontSize="10"/>
+	<subDataset name="activeServicesDataset" uuid="060e7dc2-eaab-4bb7-90cd-62e30f5995b3">
+		<field name="serviceType" class="java.lang.String"/>
+		<field name="count" class="java.lang.Long"/>
+	</subDataset>
+	<subDataset name="averageSpendingDataset" uuid="dc40046f-eca8-449f-aa4e-bc34c8f0807d">
+		<field name="customerId" class="java.lang.String"/>
+		<field name="amount" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="customerDataset" uuid="a8806b19-c160-4d8f-9b2c-9c2d826c6ea1">
+		<field name="customerId" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="activeServices" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="averageSpending" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="expiredServices" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="expiringServices" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<title>
+		<band height="70">
+			<staticText>
+				<reportElement style="Title" x="0" y="0" width="535" height="30" uuid="1645e81f-0f77-4791-b040-90faf11e2158"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Summary Report]]></text>
+			</staticText>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="30" width="535" height="20" uuid="3933b520-9dfa-4ed3-a866-7df3a60f79f8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Generato il "+ new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="150">
+			<staticText>
+				<reportElement style="SectionHeader" x="0" y="10" width="535" height="20" uuid="8134aa2d-64af-4bac-90b6-407f2f55f7f7"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Servizi attivi per tipo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="TableHeader" x="100" y="40" width="150" height="20" uuid="67a02973-3313-4173-bd77-55ad082a9566"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Tipo Servizio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="TableHeader" x="250" y="40" width="150" height="20" uuid="ebda907c-45ae-46ad-86bc-1376eecd5205"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Numero]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="100" y="60" width="300" height="80" uuid="c3a9a096-63cc-44fb-90e2-ae6c27c18e7c"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="activeServicesDataset" uuid="e3effff0-fded-4904-8e21-239269564e27">
+						<dataSourceExpression><![CDATA[$P{activeServices}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="20">
+						<textField isBlankWhenNull="true">
+							<reportElement style="TableData" x="0" y="0" width="150" height="20" uuid="6ef8e532-bda0-4926-bed3-1ff565a8f002"/>
+							<box>
+								<pen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$F{serviceType}]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement style="TableData" x="150" y="0" width="150" height="20" uuid="c0aaeb52-0f8f-4209-98b9-61af7f551eef"/>
+							<box>
+								<pen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$F{count}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+		<band height="150">
+			<staticText>
+				<reportElement style="SectionHeader" x="0" y="10" width="535" height="20" uuid="e860f06a-8886-4ab1-889a-479903cab25a"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Spesa media per cliente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="TableHeader" x="100" y="40" width="150" height="20" uuid="4d9aeaa8-03e8-4503-87e5-32e46930a636"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Cliente]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="TableHeader" x="250" y="40" width="150" height="20" uuid="114e5e30-dc3a-4ede-a800-91b54ab227ad"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Spesa Media (€)]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="100" y="60" width="300" height="80" uuid="6022b2b2-0828-4fde-b5fc-00c08bf10ce0"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="averageSpendingDataset" uuid="de683b61-1ef5-42c1-b248-1dfcdc039c1c">
+						<dataSourceExpression><![CDATA[$P{averageSpending}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="20">
+						<textField isBlankWhenNull="true">
+							<reportElement style="TableData" x="0" y="0" width="150" height="20" uuid="db056d66-845c-459a-9493-30a8024ddb00"/>
+							<box>
+								<pen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$F{customerId}]]></textFieldExpression>
+						</textField>
+						<textField pattern="#,##0.00 €" isBlankWhenNull="true">
+							<reportElement style="TableData" x="150" y="0" width="150" height="20" uuid="64a7dd90-0119-48ae-a8de-7538b9e2d2c1"/>
+							<box>
+								<pen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+		<band height="150">
+			<staticText>
+				<reportElement style="SectionHeader" x="0" y="10" width="535" height="20" uuid="3dfed645-7069-414a-ba1d-01383f6680c3"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Clienti con più di un servizio scaduto]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="TableHeader" x="150" y="40" width="200" height="20" uuid="aa09ecb1-11fd-4961-b811-7584f1f7b0ee"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Cliente]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="150" y="60" width="200" height="80" uuid="076411ab-6d91-46a4-996c-3e4018398fcd"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="customerDataset" uuid="c32e925c-e6ba-421a-ae72-e9d004ce60f6">
+						<dataSourceExpression><![CDATA[$P{expiredServices}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="20">
+						<textField isBlankWhenNull="true">
+							<reportElement style="TableData" x="0" y="0" width="200" height="20" uuid="5941e941-c95a-4d00-af59-ec723aa2f01b"/>
+							<box>
+								<pen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$F{customerId}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+		<band height="150">
+			<staticText>
+				<reportElement style="SectionHeader" x="0" y="10" width="535" height="20" uuid="e462f094-5d98-4629-8eb3-a95f048f9109"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Clienti con servizi in scadenza nei prossimi 15 giorni]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="TableHeader" x="150" y="40" width="200" height="20" uuid="906f274e-27ee-470c-8cc1-298a44454c3d"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Cliente]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="150" y="60" width="200" height="80" uuid="02f68b5f-7a0c-4e50-97d8-bd421e813450"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+					<datasetRun subDataset="customerDataset" uuid="1701529f-31ee-42fe-8a10-6a29f8594460">
+						<dataSourceExpression><![CDATA[$P{expiringServices}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:listContents height="20">
+						<textField isBlankWhenNull="true">
+							<reportElement style="TableData" x="0" y="0" width="200" height="20" uuid="1ece182b-e3f8-4587-95c2-2a3f4069a560"/>
+							<box>
+								<pen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$F{customerId}]]></textFieldExpression>
+						</textField>
+					</jr:listContents>
+				</jr:list>
+			</componentElement>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30">
+			<line>
+				<reportElement x="0" y="0" width="535" height="1" uuid="007b9d24-57d1-49f1-a2f8-a42fc501437c"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement x="0" y="10" width="267" height="20" uuid="d9d1bb77-20cb-4fc3-bc50-28715671d3bb"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Cloud Service Business Monitoring"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="267" y="10" width="268" height="20" uuid="4e059126-1efd-410c-8744-9beacba55f5d"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA["Pagina " + $V{PAGE_NUMBER} + " di " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

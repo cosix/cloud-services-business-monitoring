@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:postgres}:${DB_PORT:5432}/${DB_NAME:csbmdb}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:kafka:9092}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/cloud-services-business-monitoring
+          jwk-set-uri: http://keycloak:8080/realms/cloud-services-business-monitoring/protocol/openid-connect/certs
+
+keycloak:
+  auth-server-url: http://keycloak:8080
+
+springdoc:
+  swagger-ui:
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+      client-id: ${keycloak.resource:cloud-services-business-monitoring-client}
+      authorizationUrl: http://localhost:8180/realms/cloud-services-business-monitoring/protocol/openid-connect/auth
+      tokenUrl: http://localhost:8180/realms/cloud-services-business-monitoring/protocol/openid-connect/token
+
+management:
+  health:
+    mail:
+      enabled: false

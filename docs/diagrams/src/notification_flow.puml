@@ -1,0 +1,52 @@
+@startuml
+participant "File Processor" as Processor
+participant "Domain Event Publisher" as EventPublisher
+participant "Spring Event System" as SpringEvents
+participant "Notification Manager" as Manager
+participant "Notification Rules" as Rules
+participant "Kafka Producer" as Producer
+queue "Kafka (topic: notifications)" as KafkaTopic
+participant "Kafka Consumer" as Consumer
+participant "Email Handler" as EmailHandler
+participant "Kafka Handler" as KafkaHandler
+queue "Kafka (topic: alerts)" as AlertTopic
+actor "Team Marketing" as Marketing
+
+Processor -> EventPublisher: Pubblica FileProcessingCompletedEvent
+EventPublisher -> SpringEvents: Pubblica evento
+SpringEvents -> Manager: Notifica completamento elaborazione
+activate Manager
+
+Manager -> Rules: Esegue regole di notifica
+activate Rules
+Rules -> Rules: Verifica condizioni (servizi scaduti, servizi attivi da anni)
+Rules -> Producer: Invia notifiche (EMAIL/KAFKA)
+Producer -> KafkaTopic: Pubblica sul topic "notifications"
+deactivate Rules
+deactivate Manager
+
+KafkaTopic -> Consumer: Consuma notifiche
+activate Consumer
+Consumer -> Consumer: Deduplicazione messaggi
+Consumer -> Manager: notifyUser(notification)
+activate Manager
+
+alt Notifica Email
+    Manager -> EmailHandler: Gestisce notifica email
+    EmailHandler -> Marketing: Invia email
+else Notifica Kafka
+    Manager -> KafkaHandler: Gestisce notifica kafka
+    KafkaHandler -> Producer: Invia al topic specificato
+    Producer -> AlertTopic: Pubblica su topic "alerts.customer_expired"
+end
+
+deactivate Manager
+deactivate Consumer
+
+note right of Producer
+  In caso di errore:
+  - Retry automatico
+  - Backoff esponenziale
+  - Dead Letter Topic
+end note
+@enduml

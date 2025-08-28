@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="20250805200000-1" author="cimparato">
+
+        <createTable tableName="cloud_services">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="customer_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="service_type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="activation_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="expiration_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="numeric(10, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="timestamp"/>
+        </createTable>
+
+        <addUniqueConstraint
+                constraintName="uk_customer_service"
+                tableName="cloud_services"
+                columnNames="customer_id, service_type"/>
+
+        <createTable tableName="file_uploads">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="filename" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_hash" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="upload_date" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uploaded_by" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="total_records" type="integer"/>
+            <column name="valid_records" type="integer"/>
+            <column name="invalid_records" type="integer"/>
+        </createTable>
+
+        <addUniqueConstraint
+                constraintName="uk_file_hash"
+                tableName="file_uploads"
+                columnNames="file_hash"/>
+
+        <createTable tableName="job_execution">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="job_id" type="varchar(36)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_time" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_time" type="timestamp"/>
+            <column name="file_path" type="varchar(255)"/>
+            <column name="file_upload_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_message" type="text"/>
+            <column name="created_by" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                constraintName="uk_job_id"
+                tableName="job_execution"
+                columnNames="job_id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_job_file_upload"
+                baseTableName="job_execution"
+                baseColumnNames="file_upload_id"
+                referencedTableName="file_uploads"
+                referencedColumnNames="id"/>
+
+        <createTable tableName="service_file_relation">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="service_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="file_upload_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="line_number" type="integer"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="fk_service"
+                baseTableName="service_file_relation"
+                baseColumnNames="service_id"
+                referencedTableName="cloud_services"
+                referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+                constraintName="fk_file_upload_mapping"
+                baseTableName="service_file_relation"
+                baseColumnNames="file_upload_id"
+                referencedTableName="file_uploads"
+                referencedColumnNames="id"/>
+
+        <createTable tableName="processing_errors">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="file_upload_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="line_number" type="integer"/>
+            <column name="raw_data" type="text"/>
+            <column name="error_message" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="error_type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="fk_file_upload_error"
+                baseTableName="processing_errors"
+                baseColumnNames="file_upload_id"
+                referencedTableName="file_uploads"
+                referencedColumnNames="id"/>
+
+        <createTable tableName="notifications">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="type" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient" type="varchar(255)"/>
+            <column name="subject" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="text">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sent_at" type="timestamp"/>
+            <column name="status" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="retry_count" type="integer" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="additional_data" type="text"/>
+            <column name="error_message" type="text"/>
+            <column name="customer_id" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Indici per cloud_services -->
+        <createIndex indexName="idx_cloud_services_customer_id" tableName="cloud_services">
+            <column name="customer_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_cloud_services_status" tableName="cloud_services">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_cloud_services_expiration_date" tableName="cloud_services">
+            <column name="expiration_date"/>
+        </createIndex>
+
+        <!-- indice composto per findByCustomerIdAndServiceType -->
+        <createIndex indexName="idx_cloud_services_customer_service" tableName="cloud_services">
+            <column name="customer_id"/>
+            <column name="service_type"/>
+        </createIndex>
+
+        <!-- indice composto per findActiveServicesOlderThan -->
+        <createIndex indexName="idx_cloud_services_status_activation" tableName="cloud_services">
+            <column name="status"/>
+            <column name="activation_date"/>
+        </createIndex>
+
+        <!-- indice per findCustomersWithServicesExpiringBetween -->
+        <createIndex indexName="idx_cloud_services_status_expiration" tableName="cloud_services">
+            <column name="status"/>
+            <column name="expiration_date"/>
+        </createIndex>
+
+        <!-- Indici per job_execution -->
+        <createIndex indexName="idx_job_execution_job_id" tableName="job_execution">
+            <column name="job_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_execution_status" tableName="job_execution">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex indexName="idx_job_execution_file_upload_id" tableName="job_execution">
+            <column name="file_upload_id"/>
+        </createIndex>
+
+
+
+        <!-- Indici per notifications -->
+
+        <!-- indice per findByStatus -->
+        <createIndex indexName="idx_notifications_status" tableName="notifications">
+            <column name="status"/>
+        </createIndex>
+
+        <!-- indice per findByStatusAndRetryCountLessThan -->
+        <createIndex indexName="idx_notifications_status_retry" tableName="notifications">
+            <column name="status"/>
+            <column name="retry_count"/>
+        </createIndex>
+
+
+
+        <!-- Indici per file_uploads -->
+
+        <!-- indice per findByFileHash -->
+        <createIndex indexName="idx_file_uploads_file_hash" tableName="file_uploads">
+            <column name="file_hash"/>
+        </createIndex>
+
+        <rollback>
+            <dropTable tableName="notifications"/>
+            <dropTable tableName="processing_errors"/>
+            <dropTable tableName="service_file_relation"/>
+            <dropTable tableName="job_executions"/>
+            <dropTable tableName="file_uploads"/>
+            <dropTable tableName="cloud_services"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

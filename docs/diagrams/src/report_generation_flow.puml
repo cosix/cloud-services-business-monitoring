@@ -1,0 +1,57 @@
+@startuml
+actor "Utente (data_analyst)" as User
+participant "API REST" as API
+participant "Report Service" as ReportService
+participant "Repository" as Repository
+database "Database" as DB
+participant "PDF Generator" as PDFGenerator
+
+User -> API: Richiede report in formato JSON
+activate API
+API -> ReportService: Genera report riepilogativo
+activate ReportService
+
+ReportService -> Repository: Recupera servizi attivi per tipo
+Repository -> DB: Query aggregazione
+DB --> Repository: Risultati
+Repository --> ReportService: Dati aggregati
+
+ReportService -> Repository: Calcola spesa media per cliente
+Repository -> DB: Query aggregazione
+DB --> Repository: Risultati
+Repository --> ReportService: Dati aggregati
+
+ReportService -> Repository: Trova clienti con servizi scaduti
+Repository -> DB: Query filtrata
+DB --> Repository: Risultati
+Repository --> ReportService: Lista clienti
+
+ReportService -> Repository: Trova clienti con servizi in scadenza
+Repository -> DB: Query con intervallo date
+DB --> Repository: Risultati
+Repository --> ReportService: Lista clienti
+
+ReportService --> API: Report completo
+API --> User: Restituisce JSON
+deactivate ReportService
+deactivate API
+
+User -> API: Richiede report in formato PDF
+activate API
+API -> ReportService: Genera report PDF
+activate ReportService
+ReportService -> ReportService: Raccoglie dati per il report
+note right: Riutilizza la stessa\nlogica di business
+
+ReportService -> PDFGenerator: Genera documento PDF
+activate PDFGenerator
+PDFGenerator -> PDFGenerator: Applica template
+PDFGenerator -> PDFGenerator: Formatta dati
+PDFGenerator --> ReportService: Documento PDF
+deactivate PDFGenerator
+
+ReportService --> API: Documento PDF
+API --> User: Restituisce PDF
+deactivate ReportService
+deactivate API
+@enduml

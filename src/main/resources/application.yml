@@ -1,0 +1,180 @@
+server:
+  port: 8090
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    root: INFO
+    com.cimparato.csbm: DEBUG
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+
+spring:
+  application:
+    name: cloud-services-business-monitoring
+
+
+  output:
+    ansi:
+      enabled: 'always'
+
+  profiles:
+    active: dev
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:csbmdb}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:config/liquibase/changelog-master.xml
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:test@example.com}
+    password: ${MAIL_PASSWORD:password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectionTimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  kafka:
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9094}
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+
+    consumer:
+      group-id: notification-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false # disabilita commit automatico
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+    listener:
+      concurrency: 2 # consumer concorrenti per gruppo
+      ack-mode: record # commit dopo che ogni record è stato elaborato con successo
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8180/realms/cloud-services-business-monitoring}
+          jwk-set-uri: ${KEYCLOAK_JWK_URI:http://localhost:8180/realms/cloud-services-business-monitoring/protocol/openid-connect/certs}
+
+
+keycloak:
+  realm: cloud-services-business-monitoring
+  auth-server-url: http://localhost:8180
+  resource: cloud-services-business-monitoring-client
+  credentials:
+    secret: client-secret
+
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    oauth:
+      use-pkce-with-authorization-code-grant: true
+      client-id: ${keycloak.resource:cloud-services-business-monitoring-client}
+      authorizationUrl: http://localhost:8180/realms/cloud-services-business-monitoring/protocol/openid-connect/auth
+      tokenUrl: http://localhost:8180/realms/cloud-services-business-monitoring/protocol/openid-connect/token
+      scopes:
+        - openid
+        - profile
+    disable-swagger-default-url: true
+    config-url: ${server.servlet.context-path}/api-docs/swagger-config
+    url: ${server.servlet.context-path}/api-docs
+  default-produces-media-type: application/json
+  paths-to-match: /**
+
+management:
+  health:
+    mail:
+      enabled: false
+
+app:
+  version: @project.version@
+  kafka:
+    topic:
+      notification: notifications
+      alertCustomerExpired: alerts.customer_expired
+      partitions: 2 # uguale al numero di consumer concorrenti per massimizzare il parallelismo
+      replicationFactor: 1
+    producer:
+      retry:
+        attempts: ${ATTEMPTS:1}
+        backoff:
+          delay: 100 # ms
+          multiplier: 2
+    consumer:
+      retry:
+        attempts: ${ATTEMPTS:3}
+        backoff:
+          delay: 10000 # ms
+          multiplier: 2
+      group:
+        notification: notification-group
+
+  file-processing:
+    upload-dir: /tmp/uploads
+    allowed-extensions: csv
+    batch-size: 100
+  notification:
+    rule:
+      active-service-older-than-notification-rule:
+        years: 3
+        email:
+          sender: noreply@domain.com
+          recipient: ${MARKETING_EMAIL:marketing@domain.com}
+          subject: Upselling Opportunity - Long Term Customer
+          content:
+      expired-services-notification-rule:
+        max-expired-services-count: 5
+        alert:
+          sender:
+          subject:
+          content:
+  scheduling:
+    thread-pool-task-executor:
+      file-processing-task-executor:
+        core-pool-size: 2
+        max-pool-size: 5
+        queue-capacity: 50
+        thread-name-prefix: file-proc-
+        keep-alive-seconds: 60
+    task-scheduler:
+      pool-size: 3
+      thread-name-prefix: scheduled-
+      wait-for-tasks-to-complete-on-shutdown: true
+      await-termination-seconds: 60
+      job-scheduling:
+        failed-jobs-retry-cron: "0 */10 * * * *"  # Ogni 10 minuti
+        report-scheduler-status-cron: "0 0 */1 * * *" # Ogni ora

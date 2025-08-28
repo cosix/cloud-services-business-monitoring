@@ -1,0 +1,134 @@
+server:
+  port: 0  # porta casuale per evitare conflitti durante i test
+
+logging:
+  level:
+    root: INFO
+    com.cimparato.csbm: DEBUG
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+    org.hibernate.SQL: DEBUG
+
+spring:
+  application:
+    name: cloud-services-business-monitoring-test
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+
+  liquibase:
+    enabled: false
+
+  mail:
+    host: localhost
+    port: 3025  # porta per GreenMail (mock SMTP server)
+    username: test@example.com
+    password: password
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  kafka:
+    bootstrap-servers: ${embedded.kafka.brokers}  # impostato da EmbeddedKafkaBroker
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+
+    consumer:
+      group-id: test-notification-group
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.cimparato.csbm.domain,com.cimparato.csbm.dto
+
+    listener:
+      concurrency: 1
+      ack-mode: record
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+app:
+  kafka:
+    topic:
+      notification: test-notifications
+      alertCustomerExpired: test-alerts.customer_expired
+      partitions: 1
+      replicationFactor: 1
+    producer:
+      retry:
+        attempts: 1
+        backoff:
+          delay: 10
+          multiplier: 2
+    consumer:
+      retry:
+        attempts: 1
+        backoff:
+          delay: 10
+          multiplier: 2
+      group:
+        notification: test-notification-group
+
+  file-processing:
+    upload-dir: ./target/test-uploads
+    allowed-extensions: csv
+    batch-size: 10
+  notification:
+    rule:
+      active-service-older-than-notification-rule:
+        years: 3
+        email:
+          sender: test@example.com
+          recipient: test-marketing@example.com
+          subject: Test - Upselling Opportunity
+          content:
+      expired-services-notification-rule:
+        max-expired-services-count: 5
+        alert:
+          sender:
+          subject:
+          content:
+  scheduling:
+    thread-pool-task-executor:
+      file-processing-task-executor:
+        core-pool-size: 1
+        max-pool-size: 2
+        queue-capacity: 10
+        thread-name-prefix: test-file-proc-
+        keep-alive-seconds: 10
+    task-scheduler:
+      pool-size: 1
+      thread-name-prefix: test-scheduled-
+      wait-for-tasks-to-complete-on-shutdown: true
+      await-termination-seconds: 10
+      job-scheduling:
+        failed-jobs-retry-cron: "*/5 * * * * *"  # Ogni 5 secondi per i test
+        report-scheduler-status-cron: "0 0 */1 * * *" # Ogni ora

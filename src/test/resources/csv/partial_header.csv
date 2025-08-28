@@ -1,0 +1,3 @@
+customer_id,service_type,activation_date,expiration_date,amount
+CUST001,PEC,2018-01-15,2026-11-15,29.99
+CUST001,HOSTING,2022-05-10,2023-05-10,120.50
