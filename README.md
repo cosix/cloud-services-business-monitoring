@@ -178,7 +178,7 @@ Questo approccio basato su eventi garantisce un'architettura bassamente accoppia
 
 ## Architettura di Sistema - High Level Design
 
-<img src="docs/diagrams/images/hdl.png" alt="Domain Model" width="1980"/>
+<img src="docs/diagrams/images/hld.png" alt="Domain Model" width="1980"/>
 
 L'architettura di **Cloud Services Business Monitoring** è stata progettata come un sistema containerizzato completo, 
 orchestrato tramite **Docker**, che integra diverse tecnologie per fornire una soluzione robusta e scalabile per il 
