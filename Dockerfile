@@ -1,7 +1,7 @@
 FROM eclipse-temurin:17-jre-alpine
 
-# installa curl e netcat
-RUN apk add --no-cache curl netcat-openbsd
+# installa curl e netcat e dos2unix
+RUN apk add --no-cache curl netcat-openbsd dos2unix
 
 # crea un utente non-root
 RUN addgroup -S spring && adduser -S spring -G spring
@@ -14,7 +14,8 @@ WORKDIR /app
 COPY target/cloud-services-business-monitoring-1.0.jar app.jar
 COPY keycloak/wait-for-keycloak.sh /app/wait-for-keycloak.sh
 
-RUN chmod +x /app/wait-for-keycloak.sh && \
+RUN dos2unix /app/wait-for-keycloak.sh && \
+    chmod +x /app/wait-for-keycloak.sh && \
     chown spring:spring /app/wait-for-keycloak.sh
 
 # imposta l'utente non-root
