@@ -585,9 +585,13 @@ docker build -t cloud-services-business-monitoring:latest .
 docker-compose up -d
 ```
 
-Attendi qualche minuto (Keycloak richiede più tempo per inizializzarsi completamente) e verifica che tutti i servizi siano in esecuzione
+Prima di utilizzare l'API attendi qualche minuto, Keycloak richiede più tempo per inizializzarsi completamente, puoi verifica quanto segue:
 ```
-docker ps
+# verifica che Keycloak sia avviato completamente e che sia in ascolto sulla porta 8080
+docker-compose logs -f keycloak
+
+# verifica che tutti i servizi siano avviati correttamente
+docker-compose ps
 ```
 
 - #### Ambiente di Sviluppo (Solo Servizi)
@@ -939,4 +943,5 @@ Se nonostante tutto l'errore persiste, prova a riavviare i container:
 - **Problema**: Errori di connessione a Kafka. <br>**Soluzione**: Assicurati che Kafka sia avviato con docker-compose logs kafka <br><br>
 
 - **Problema**: Errori di autenticazione con Keycloak. <br> **Soluzione**: Verifica che Keycloak sia configurato correttamente e accessibile.
+
 ---
