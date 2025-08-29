@@ -19,6 +19,6 @@ sleep 90
 #  sleep 5
 # done
 
-# echo "Keycloak is ready - starting application"
+# echo "Keycloak is ready - starting application..."
 echo "Starting application"
 exec java $JAVA_OPTS -jar app.jar
