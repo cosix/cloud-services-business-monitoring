@@ -104,7 +104,7 @@ Flussi Applicativi Principali
     - I job vengono quindi rielaborati automaticamente, permettendo di recuperare da errori temporanei
     - Questo approccio aumenta la resilienza del sistema senza richiedere intervento manuale
    
-Questo approccio basato su eventi garantisce un'architettura bassamente accoppiata, dove i componenti comunicano in modo asincrono attraverso il sistema di eventi di Spring, migliorando la scalabilità e la manutenibilità dell'applicazione.
+L'approccio basato su eventi garantisce un'architettura bassamente accoppiata, dove i componenti comunicano in modo asincrono attraverso il sistema di eventi di Spring, migliorando la scalabilità e la manutenibilità dell'applicazione.
 
 
 ### Sistema di Notifiche
