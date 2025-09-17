@@ -1,7 +1,10 @@
 FROM eclipse-temurin:17-jre-alpine
 
-# installa curl e netcat e dos2unix
-RUN apk add --no-cache curl netcat-openbsd dos2unix
+# installa curl e netcat e dos2unix e i font necessari
+RUN apk add --no-cache curl netcat-openbsd dos2unix fontconfig ttf-liberation msttcorefonts-installer
+
+# esegue l'installer dei font Microsoft
+RUN update-ms-fonts && fc-cache -f
 
 # crea un utente non-root
 RUN addgroup -S spring && adduser -S spring -G spring
